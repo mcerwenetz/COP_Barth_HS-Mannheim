@@ -1,6 +1,5 @@
 package generics;
 
-import com.sun.glass.ui.CommonDialogs.Type;
 
 public class GenericClass<T> {
 	private T t;
