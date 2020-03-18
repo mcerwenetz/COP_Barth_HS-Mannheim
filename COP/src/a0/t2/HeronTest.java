@@ -32,7 +32,25 @@ class HeronTest {
 	void checkSol() {
 		Heron h = new Heron();
 		h.calcSol();
-		assertEquals(2, h.sol);
+		double sol = h.getSol();
+		double sol_twopoint = Math.round(sol*100.0)/100.0;
+		assertEquals(3.16, sol_twopoint);
+	}
+	
+	@Test
+	void checkSolNonStandard() {
+		Double x = 4.0;
+		Double epsilon = 10e-7;
+		String arguments = x.toString() + "\n" + epsilon.toString();
+		ByteArrayInputStream in = new ByteArrayInputStream(arguments.getBytes());
+		System.setIn(in);
+		Heron h = new Heron();
+		h.get_inputs();
+		h.calcSol();
+		double sol = h.getSol();
+		double sol_twopoint = Math.round(sol*100.0)/100.0;
+		assertEquals(Math.sqrt(x), sol_twopoint);
+
 	}
 
 }
