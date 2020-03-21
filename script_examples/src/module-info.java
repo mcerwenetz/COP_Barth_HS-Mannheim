@@ -1,2 +1,0 @@
-module script_examples {
-}

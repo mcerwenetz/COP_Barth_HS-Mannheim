@@ -1,4 +1,4 @@
-package script_example.chap3.primegen;
+package script_examples.chap3.primegen;
 
 public class IthPrimeRunnable extends Thread implements Runnable {
 	private int i;

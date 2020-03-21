@@ -1,8 +1,8 @@
-package script_example.chap3.primegen;
+package script_examples.chap3.primegen;
 
 public class RunIthPrimeMany {
 	 public static void main(String[] args) throws InterruptedException {
-		int limit = 10000;
+		int limit = 100000;
 		int[] is = {limit, limit+1, limit+2};
 		IthPrime[] ith = {null,null,null};
 		for(int j=0; j < is.length; j++) {

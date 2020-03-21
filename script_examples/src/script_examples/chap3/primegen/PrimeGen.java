@@ -1,4 +1,4 @@
-package script_example.chap3.primegen;
+package script_examples.chap3.primegen;
 
 import java.util.ArrayList;
 import java.util.List;
