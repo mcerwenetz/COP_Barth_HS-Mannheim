@@ -14,4 +14,20 @@ public class Util {
 		long current = System.nanoTime();
 		return (current-nanoSecs)/1000000;
 	}
+	
+	public final static void sleep(long millisecs) {
+		try{
+			Thread.sleep(millisecs);
+		}catch(InterruptedException e) {
+			System.out.println("Util.sleep: Interrupted");
+		}
+	}
+	
+	public final static void join(Thread d) {
+		try {
+			d.join();
+		} catch (InterruptedException e) {
+			System.out.println("Util.join: Interrupt joining");
+		}
+	}
 }
