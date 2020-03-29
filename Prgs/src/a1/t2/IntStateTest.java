@@ -4,20 +4,23 @@ import java.util.LinkedList;
 import java.util.List;
 import util.Util;
 
+
 public class IntStateTest {
 	
 
 
 	public static void main(String[] args) {
-		int threadcount = 1;
+
+		int threadcount = 2;
 		int goal = threadcount*IntSafeStateThread.inc_to;
+		
 		//Unsafe
 		List<IntUnsafeThread> unsafeThreadList = new LinkedList<IntUnsafeThread>();
+		Util.resetTime();
 		for(int i=0; i <threadcount; i++) {
 			IntUnsafeThread e = new IntUnsafeThread();
 			unsafeThreadList.add(e);
 		}
-		Util.resetTime();
 		for(Thread t : unsafeThreadList) {
 			t.start();
 		}
@@ -30,6 +33,7 @@ public class IntStateTest {
 		error*=100;
 		error = Math.round(error*100)/100;
 		System.out.println(IntUnsafeThread.unsafe.getValue() + " " + unsafeTime + "ms Error:" + error + "%");
+	
 	
 		//Safe
 		List<IntSafeStateThread> safeThreadList = new LinkedList<IntSafeStateThread>();
