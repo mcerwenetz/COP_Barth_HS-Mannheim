@@ -2,42 +2,52 @@ package a1.t1;
 
 public class Particle extends AbstractParticle {
 	
-	private Thread particle_thread = new Thread();
+	Object lock = new Object();
 	
+	private Thread particle_thread = new Thread(){
+		public void run() {
+			while (keepalive) {
+				synchronized (lock) {
+					while(paused) {
+						try {
+							lock.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				
+				move();
+				try {
+					Thread.sleep(ParticleApp.MSPERFRAME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	};
+		
 	private volatile boolean keepalive = true;
+	private volatile boolean paused = false;
 	
 	public Particle() {
-		cont();
+		particle_thread.start();
 	}
 	
 
 	@Override
 	public void pause() {
-		keepalive=false;
-		try {
-			particle_thread.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		paused = true;
+
 	}
 
 	@Override
 	public void cont() {
-		keepalive=true;
-		particle_thread = new Thread() {
-				public void run() {
-					while (keepalive) {
-						move();
-						try {
-							Thread.sleep(ParticleApp.MSPERFRAME);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			};
-		particle_thread.start();
+		paused = false;
+		synchronized (lock) {
+			lock.notify();
+		}
 	}
 
 	@Override

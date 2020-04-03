@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 public class ParticleApp extends JFrame {
     private static final long serialVersionUID = 3123790023447005992L;
 
-    public final static int FPS = 120;
+    public final static int FPS = 60;
     public final static int MSPERFRAME = 1000 / FPS;
 
     private ParticleCanvas particleCanvas;
