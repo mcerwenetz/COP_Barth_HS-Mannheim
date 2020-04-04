@@ -5,7 +5,7 @@ public class SafeCounter implements Counter {
 	private int counter;
 	
 	public SafeCounter() {
-		int counter = 0;
+		counter = 0;
 	}
 	
 	@Override
