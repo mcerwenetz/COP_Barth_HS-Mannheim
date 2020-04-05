@@ -7,21 +7,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class CharPeeker extends Thread {
+
 	private Queue<Character> charlist;
-	static Object lock = new Object();
-	AtomicBoolean keep_producing;
-	Map<Character, Integer> counters = new HashMap<Character, Integer>();
-	volatile boolean keep_running = true;
-	
-	Character winner;
+	private Object lock = new Object(); // pb: kein static, static ist fast immer böse
+	private AtomicBoolean keep_producing;
+	private Map<Character, Integer> counters = new HashMap<Character, Integer>();
+	boolean keep_running = true; // pb: muss nicht volatil sein, nur in dem Thread genutzt
+
+	private char winner = 0; // pb: okay, nur kein Lock gebraucht, wenn es nach dem join gelesen wird
 	
 	public CharPeeker(Queue<Character> charlist, Object lock, AtomicBoolean keep_producing) {
 		for (Character character : CharacterRace.alphabet.toCharArray()) {
 			counters.put(character, 0);
 		}
-		this.charlist=charlist;
-		CharPeeker.lock=lock;
-		this.keep_producing=keep_producing;
+		this.charlist = charlist;
+		this.lock = lock;
+		this.keep_producing = keep_producing;
 	}
 	
 	@Override
@@ -33,35 +34,40 @@ public class CharPeeker extends Thread {
 					try {
 						lock.wait();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 				}
 				c = charlist.remove();
 			}
 			countchar(c);
-			if(limit_reached()) {
+			// pb, sie wissen ja, dass es nur für c passiert sein kann
+			// das sollte man noch fixen
+			if (limit_reached()) {
 				keep_producing.set(false);
-				keep_running=false;
+				keep_running = false;
 			}
 		}
 	}
+	
 	private boolean limit_reached() {
-		boolean a=false;
+		// pb, man muss ja schon nicht durch alle Zeichen gehen,
+		// aber wozu die extra Variable?
 		for (Character character : CharacterRace.alphabet.toCharArray()) {
-			if(counters.get(character) < 1000) {
-				a= false;
-			}else {
-				winner=character;
-				a= true;
-				break;
+			if (counters.get(character) >= 1000) {
+				winner = character;
+				return true;
 			}
 		}
-		return a;
+		return false;
 	}
 
 	private void countchar(Character c) {
-		counters.replace(c, counters.get(c)+1);
+		counters.put(c, counters.get(c)+1); // pb: put ist okay
+	}
+
+	// pb: Darf nur nach join gelesen werden wegen Sichtbarkeit
+	public char getWinner() {
+		return winner; 
 	}
 
 }
