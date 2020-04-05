@@ -1,34 +1,55 @@
 package a1.t3;
 
-import java.net.URL;
-import java.net.MalformedURLException;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
-// Instances of ConsumeNumbers may retrieve several numbers 
-// (one each by calling next) from the WebService provided
-// by ServeNumbers. Do not change this file. Look at main 
-// for a simple usage of ConsumeNumbers.
+// Instances of ConsumeNumbers may retrieve several numbers (one each 
+// by calling next) from the SocketServer provided by ServeNumbers. 
+// Do not change this file. Look at main for a simple usage of ConsumeNumbers.
 
 public class ConsumeNumbers {
-	private final static String surl = "http://localhost:8080/number?wsdl";
-	private Numbers numbers;
-	public ConsumeNumbers() {
+	private final static int PORT = ServeNumbers.PORT;
+
+	// Horrible design on purpose, one connection per number
+	public Long next() {
+		Socket socket =null;
+		DataOutputStream dos=null;
+		DataInputStream dis=null;
+		long value;
+		boolean read = false;
 		try {
-			URL url = new URL(surl);
-			QName qname = new QName("http://localhost:8080/number", 
-									"ServeNumbersService");
-			Service service = Service.create(url, qname);
-			numbers = service.getPort(Numbers.class);
-		} catch (MalformedURLException e) {
+			socket = new Socket("localhost", PORT);
+			dos = new DataOutputStream(socket.getOutputStream());
+			dis = new DataInputStream(socket.getInputStream());
+			dos.writeInt(ServeNumbers.CMD_NEXT);
+			value = dis.readLong();
+			read = true;
+			dos.writeInt(ServeNumbers.CMD_END);
+		} catch (IOException e) {
+			try {
+				if (dos != null) dos.close();
+			} catch (IOException ignore) {
+			}
+			try {
+				if (dis != null) dis.close();
+			} catch (IOException ignore) {
+			}
 			throw new RuntimeException(e);
+		} finally {
+			try {
+				if (socket != null) socket.close();			
+			} catch (IOException ignore) {
+			}
+		}
+		if (read) {
+			return value;
+		} else {
+			throw new RuntimeException("read but could not send CMD_END");
 		}
 	}
-
-	public long next() {
-		return numbers.next();
-	}
-
+	
 	public static void main(String[] args) {
 		final ConsumeNumbers consumeNumbers = new ConsumeNumbers();
 		for (int i=0; i<17; i++) {
