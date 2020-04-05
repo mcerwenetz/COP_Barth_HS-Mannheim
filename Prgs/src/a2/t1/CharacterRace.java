@@ -27,6 +27,15 @@ public class CharacterRace {
 		CharPeeker charPeeker = new CharPeeker(charlist, lock, keep_producing);		
 		charPeeker.start(); // pb: zusammen lassen, oder nach oben
 		
+		// pb: sorry, das war der eigentlich schon; also zuerst den joinen ist ein
+		// funktionaler Unterschied. Der setzt ja die Variable, die den anderen
+		// klar macht, dass es soweit ist auf wahr. Dann machen wir den fertig
+		// und warten auf die anderen. 
+		// Aber ganz ehrlich, bei  mir hat das von vornherein immer geklappt und
+		// eigentlich müsste es auch bei Ihnen klappen. Da sie ja nur jedesMal gejoint
+		// haben und das nach dem ersten Mal ja einfach nur immer klappt.
+		// Dann bleibt nur die xxGB RAM, die Ihre erste Lösung vielleicht erzeugt hat.
+		// Das ist jetzt nicht mehr so
 		try {
 			charPeeker.join(); // pb: zuerst den joinen, nicht jedesmal joinen
 		} catch (InterruptedException e) {
