@@ -1,21 +1,23 @@
 package a0.t2;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 class HeronTest {
 
+	static double EPS = 0.000001;
+	
 	@Test
 	void x_test_input() {
 		ByteArrayInputStream in = new ByteArrayInputStream("123\n456".getBytes());
 		System.setIn(in);
 		Heron h = new Heron();
 		h.get_inputs();
-		assertEquals(123, h.x);
-		assertEquals(456, h.epsilon);
+		assertEquals(123, h.x, EPS);
+		assertEquals(456, h.epsilon, EPS);
 	}
 	
 	@Test
@@ -24,8 +26,8 @@ class HeronTest {
 		System.setIn(in);
 		Heron h = new Heron();
 		h.get_inputs();
-		assertEquals(10.0, h.x);
-		assertEquals(10e-7, h.epsilon);
+		assertEquals(10.0, h.x, EPS);
+		assertEquals(10e-7, h.epsilon, EPS);
 	}
 	
 	@Test
@@ -34,7 +36,7 @@ class HeronTest {
 		h.calcSol();
 		double sol = h.getSol();
 		double sol_twopoint = Math.round(sol*100.0)/100.0;
-		assertEquals(3.16, sol_twopoint);
+		assertEquals(3.16, sol_twopoint, EPS);
 	}
 	
 	@Test
@@ -49,7 +51,7 @@ class HeronTest {
 		h.calcSol();
 		double sol = h.getSol();
 		double sol_twopoint = Math.round(sol*100.0)/100.0;
-		assertEquals(Math.sqrt(x), sol_twopoint);
+		assertEquals(Math.sqrt(x), sol_twopoint, EPS);
 
 	}
 
