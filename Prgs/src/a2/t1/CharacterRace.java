@@ -25,10 +25,10 @@ public class CharacterRace {
 			charProdThread.start();
 		}
 		CharPeeker charPeeker = new CharPeeker(charlist, lock, keep_producing);		
-		charPeeker.start(); // zusammen lassen, oder nach oben
+		charPeeker.start(); // pb: zusammen lassen, oder nach oben
 		
 		try {
-			charPeeker.join(); // zuerst den joinen, nicht jedesmal joinen
+			charPeeker.join(); // pb: zuerst den joinen, nicht jedesmal joinen
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
