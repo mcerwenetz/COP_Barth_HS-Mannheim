@@ -24,8 +24,8 @@ public class CharacterRace {
 		for (CharProdThread charProdThread : cpt_arr) {
 			charProdThread.start();
 		}
-		CharPeeker charPeeker = new CharPeeker(charlist, lock, keep_producing);		
-		charPeeker.start(); // pb: zusammen lassen, oder nach oben
+		CharConsumer consumer = new CharConsumer(charlist, lock, keep_producing);		
+		consumer.start(); // pb: zusammen lassen, oder nach oben
 		
 		// pb: sorry, das war der eigentlich schon; also zuerst den joinen ist ein
 		// funktionaler Unterschied. Der setzt ja die Variable, die den anderen
@@ -37,7 +37,7 @@ public class CharacterRace {
 		// Dann bleibt nur die xxGB RAM, die Ihre erste Lösung vielleicht erzeugt hat.
 		// Das ist jetzt nicht mehr so
 		try {
-			charPeeker.join(); // pb: zuerst den joinen, nicht jedesmal joinen
+			consumer.join(); // pb: zuerst den joinen, nicht jedesmal joinen
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
@@ -48,7 +48,7 @@ public class CharacterRace {
 				throw new RuntimeException(e);
 			}
 		}
-		System.out.println("Winner " + charPeeker.getWinner()); // pb: immmer getter
+		System.out.println("Winner " + consumer.getWinner()); // pb: immmer getter
 	}
 
 }

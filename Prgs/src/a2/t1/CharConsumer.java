@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class CharPeeker extends Thread {
+public class CharConsumer extends Thread {
 
 	private Queue<Character> charlist;
 	private Object lock = new Object(); // pb: kein static, static ist fast immer böse
@@ -15,8 +15,9 @@ public class CharPeeker extends Thread {
 	boolean keep_running = true; // pb: muss nicht volatil sein, nur in dem Thread genutzt
 
 	private char winner = 0; // pb: okay, nur kein Lock gebraucht, wenn es nach dem join gelesen wird
+	private Integer winner_threshold=100;
 	
-	public CharPeeker(Queue<Character> charlist, Object lock, AtomicBoolean keep_producing) {
+	public CharConsumer(Queue<Character> charlist, Object lock, AtomicBoolean keep_producing) {
 		for (Character character : CharacterRace.alphabet.toCharArray()) {
 			counters.put(character, 0);
 		}
@@ -53,7 +54,7 @@ public class CharPeeker extends Thread {
 		// pb, man muss ja schon nicht durch alle Zeichen gehen,
 		// aber wozu die extra Variable?
 		for (Character character : CharacterRace.alphabet.toCharArray()) {
-			if (counters.get(character) >= 1000) {
+			if (counters.get(character) >= winner_threshold) {
 				winner = character;
 				return true;
 			}
