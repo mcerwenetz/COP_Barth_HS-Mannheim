@@ -1,37 +1,34 @@
 package a2.t2;
 
-import java.math.BigInteger;
 import java.util.concurrent.locks.Lock;
 
 public class PrimeCounterThread extends Thread {
 
-	BigInteger lowerlimit;
-	BigInteger upperlimit;
-	BigInteger[] zaehler;
-
+	BigIntHolder upperlimit;
+	BigIntHolder zaehler;
+	IntHolder primes;
+	
+	
 	Lock lock;
-	Integer[] primes;
 
-	public PrimeCounterThread(BigInteger ll, BigInteger ul, Lock lock, BigInteger[] zaehler, Integer[] primes) {
-		this.lowerlimit = ll;
-		this.upperlimit = ul;
-		this.zaehler = zaehler;
-		this.lock = lock;
+	public PrimeCounterThread(BigIntHolder upperlimit, BigIntHolder zaehler, IntHolder primes, Lock lock) {
+		this.upperlimit = upperlimit;
+		this.zaehler=zaehler;
 		this.primes = primes;
+		this.lock = lock;
 	}
 
 	@Override
 	public void run() {
-		while (zaehler[0].doubleValue() <= upperlimit.doubleValue()) {
+		while (zaehler.getB().doubleValue() <= upperlimit.getB().doubleValue()) {
 			try {
 				lock.lock();
-				if (zaehler[0].isProbablePrime(1)) {
-					primes[0]++;
+				if (zaehler.getB().isProbablePrime(1)) {
+					primes.plusplus();;
 
 				}
-				zaehler[0] = zaehler[0].add(BigInteger.ONE);
-			}
-			finally {
+				zaehler.plusplus();
+			} finally {
 				lock.unlock();
 			}
 		}
