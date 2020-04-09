@@ -4,24 +4,23 @@ import java.math.BigInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import util.*;
+import util.Util;
 
 class ProbablePrime {
 
 	public static void main(String[] args) {
-		BigInteger lowerlimit = BigInteger.ONE;
-		BigInteger upperlimit = new BigInteger("100");
-		BigInteger[] zaehler= {lowerlimit};
-		
-		int maxthreads = Runtime.getRuntime().availableProcessors();
-//		int maxthreads = 2;
-		Thread[] primeThreads = new Thread[maxthreads];
+		BigIntHolder zaehler = new BigIntHolder(new BigInteger("1"));
+		BigIntHolder upperlimit = new BigIntHolder(BigInteger.TEN.pow(8));
+		IntHolder primes = new IntHolder(0);
+		int threadcount = upperlimit.getB().intValue() - zaehler.getB().intValue();
 		Lock lock = new ReentrantLock();
+		MySemaphore sem = new MySemaphore(16);
 		
-		Integer[] primes = {0};
+		Thread[] primeThreads = new Thread[threadcount];
 		
-		for (int i = 0; i < primeThreads.length; i++) {
-			primeThreads[i] = new PrimeCounterThread(lowerlimit,upperlimit,lock,zaehler,primes);
+		
+		for (BigInteger i = BigInteger.ZERO; i.doubleValue() < primeThreads.length; i=i.add(BigInteger.ONE)) {
+			primeThreads[i.intValue()] = new PrimeCounterThreadSingle(i, primes, lock, sem);
 		}
 
 		for (var i : primeThreads) {
@@ -31,7 +30,8 @@ class ProbablePrime {
 		for (var i : primeThreads) {
 			Util.join(i);
 		}
-		System.out.println(primes[0]);
+		
+		System.out.println(primes);
 	}
 
 }
