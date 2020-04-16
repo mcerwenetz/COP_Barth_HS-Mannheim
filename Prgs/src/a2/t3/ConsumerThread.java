@@ -1,6 +1,7 @@
 package a2.t3;
 
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
@@ -10,17 +11,16 @@ public class ConsumerThread extends Thread {
 	Boolean even;
 	Condition con;
 	Integer sum = 0;
-	volatile Boolean done;
-	
-	public ConsumerThread(LinkedList<Integer> list, Lock lock, Boolean even, Condition con, Boolean done) {
+	Boolean done=false;
+
+	public ConsumerThread(LinkedList<Integer> list, Lock lock, Boolean even, Condition con) {
 		this.list=list;
 		this.lock=lock;
 		this.even = even;
 		this.con=con;
-		this.done=done;
 	}
-	
-	
+
+
 	public Boolean getDone() {
 		return done;
 	}
@@ -33,31 +33,28 @@ public class ConsumerThread extends Thread {
 
 	@Override
 	public void run() {
-		while (this.done==false) {
-			while (list.isEmpty()) {
-				try {
-					con.await();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			lock.lock();
-			
-			Integer got;
+		Integer got=0;
+		while (!done) {
 			try {
-				got = list.removeLast();
+				lock.lock();
+				if(list.size() != 0) {
+					got = list.remove();
+					if (even && got %2 == 0) {
+						this.sum += got;
+					}
+					else {
+						this.sum += got;					}
+				}
+				con.await(100, TimeUnit.MICROSECONDS);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} finally {
 				lock.unlock();
 			}
-			if (even && ((got %2) == 0)) {
-//				this.sum += list.removeLast();
-				this.sum++;
-			}
-			else {
-//				this.sum+=list.removeLast();
-				this.sum++;
-			}
+
+
+
 		}
 	}
 }

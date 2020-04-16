@@ -14,9 +14,8 @@ public class OddEven {
 		Lock lock = new ReentrantLock();
 //		MyCondition con = new MyCondition();
 		Condition con = lock.newCondition();
-		Boolean done = false;
 
-		ProducerThread[] prodThreads = new ProducerThread[10];
+		ProducerThread[] prodThreads = new ProducerThread[1];
 		ConsumerThread[] conThreads = new ConsumerThread[2];
 
 		for (int i = 0; i < prodThreads.length; i++) {
@@ -30,7 +29,7 @@ public class OddEven {
 			} else {
 				even = false;
 			}
-			conThreads[i] = new ConsumerThread(list, lock, even, con, done);
+			conThreads[i] = new ConsumerThread(list, lock, even, con);
 		}
 
 		for (ProducerThread thread : prodThreads) {

@@ -22,12 +22,12 @@ public class ProducerThread extends Thread {
 		@Override
 		public void run() {
 			Random rand = new Random();
-			for(int i = 0; i < 5000; i++) {
+			for(int i = 0; i < 5; i++) {
 				Integer a = Math.abs(rand.nextInt()%400);
-				lock.lock();
 				try {
+					lock.lock();
 					list.add(a);
-					con.signal();
+					con.signalAll();
 				} finally {
 					lock.unlock();
 				}
