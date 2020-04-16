@@ -3,6 +3,8 @@ package a2.t4;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.Lock;
 
+import util.Sum;
+
 public class OddConsumerThread extends Thread {
 	
 	Boolean conDone=false;

@@ -1,4 +1,4 @@
-package a2.t4;
+package util;
 
 public class Sum {
 	Integer sum;
