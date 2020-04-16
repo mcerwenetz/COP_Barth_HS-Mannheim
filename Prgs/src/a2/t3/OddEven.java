@@ -5,6 +5,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import util.Sum;
 import util.Util;
 
 public class OddEven {
@@ -14,7 +15,10 @@ public class OddEven {
 		Lock lock = new ReentrantLock();
 //		MyCondition con = new MyCondition();
 		Condition con = lock.newCondition();
+		Sum evensum = new Sum(0);
+		Sum oddsum = new Sum(0);
 
+		
 		ProducerThread[] prodThreads = new ProducerThread[1];
 		ConsumerThread[] conThreads = new ConsumerThread[2];
 
@@ -23,13 +27,11 @@ public class OddEven {
 		}
 
 		for (int i = 0; i < conThreads.length; i++) {
-			Boolean even;
 			if (i % 2 == 0) {
-				even = true;
+				conThreads[i]=new EvenConsumerThread(list, lock, con, evensum);
 			} else {
-				even = false;
+				conThreads[i]=new OddConsumerThread(list, lock, con, oddsum);
 			}
-			conThreads[i] = new ConsumerThread(list, lock, even, con);
 		}
 
 		for (ProducerThread thread : prodThreads) {
@@ -49,9 +51,7 @@ public class OddEven {
 			Util.join(thread);
 		}
 
-		for (ConsumerThread consumerThread : conThreads) {
-			System.out.println("is even:" + consumerThread.even + " " + consumerThread.sum);
-		}
+		System.out.println("Evensum: " + evensum + "\nOddsum: " + oddsum);
 	}
 
 }
