@@ -22,7 +22,7 @@ public class ProducerThread extends Thread {
 		@Override
 		public void run() {
 			Random rand = new Random();
-			for(int i = 0; i < 5; i++) {
+			for(int i = 0; i < 1000; i++) {
 				Integer a = Math.abs(rand.nextInt()%400);
 				try {
 					lock.lock();
