@@ -25,9 +25,7 @@ public class EvenConsumerThread extends Thread {
 		while (!conDone) {
 			try {
 				evenLock.lock();
-				if (evenConQueue.peek() != null) {
-					sum.increaseBy(evenConQueue.remove());
-				}
+				sum.increaseBy(evenConQueue.remove());
 			} finally {
 				evenLock.unlock();
 			}

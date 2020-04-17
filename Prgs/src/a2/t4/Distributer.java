@@ -44,7 +44,7 @@ public class Distributer extends Thread {
 
 	private void createConsumers() {
 
-		for (int i = 0; i <8; i++) {
+		for (int i = 0; i <1; i++) {
 			OddConsumerThread odd = new OddConsumerThread(oddConQueue, oddLock, oddSum);
 			EvenConsumerThread even = new EvenConsumerThread(evenConQueue, evenLock, evenSum);
 			oddthreads.add(odd);
@@ -61,9 +61,7 @@ public class Distributer extends Thread {
 		while (!prodDone) {
 			try {
 				prodLock.lock();
-				if (queue.peek() != null) {
-					addtoque(queue.poll());
-				}
+				addtoque(queue.poll());
 			} finally {
 				prodLock.unlock();
 			}

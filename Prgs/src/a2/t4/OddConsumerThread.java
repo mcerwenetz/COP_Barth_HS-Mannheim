@@ -28,9 +28,7 @@ public class OddConsumerThread extends Thread {
 		while (!conDone) {
 			try {
 				oddLock.lock();
-				if (oddConQueue.peek() != null) {
-					sum.increaseBy(oddConQueue.remove());
-				}
+				sum.increaseBy(oddConQueue.remove());
 			} finally {
 				oddLock.unlock();
 			}
