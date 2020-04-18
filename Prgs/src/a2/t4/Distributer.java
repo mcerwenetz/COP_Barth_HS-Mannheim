@@ -9,19 +9,38 @@ import java.util.concurrent.locks.ReentrantLock;
 import util.Sum;
 import util.Util;
 
+
+// Aktuell kriege ich beim laufen lassen nullpointer exception...
+
 public class Distributer extends Thread {
 
 	Lock prodLock;
-	Boolean prodDone=false;
+	
+	Boolean prodDone=false; // das große Boolean bringt nix, 
+	// wenn Sie Sichtbarkeit wollen, dann AtomicBoolean oder
+	// Sie wissen was Sie tun und volatile boolean
+	
 	BlockingQueue<Integer> queue;
 
-	Boolean conDone;
+	Boolean conDone; // hier auch, Sichtbarkeit!
+	
 	BlockingQueue<Integer> oddConQueue;
 	BlockingQueue<Integer> evenConQueue;
+	
+	// keine Locks
 	Lock evenLock;
 	Lock oddLock;
+	
 	LinkedList<OddConsumerThread> oddthreads;
 	LinkedList<EvenConsumerThread> eventhreads;
+	// Wieso? nur einer, und wozu kennt der die?
+	// Übergeben Sie einem Arbeiter nur die Sachen, die er
+	// wissen muss. Der Distributor kriegt 3 Queues, fertig
+	// der Arbeiter macht keine threads...
+
+	
+	// nee, die kennt Distributor nicht, Dann müsste man ja 
+	// den Distributor ändern, wenn man zählt...
 	Sum oddSum = new Sum(0);
 	Sum evenSum = new Sum(0);
 
