@@ -23,9 +23,10 @@ public class ConsumerThread extends Thread {
 		Integer integer = 0;
 		while (!conDone.get() || !consumerQueue.isEmpty()) {
 			try {
-				integer = consumerQueue.poll(200, TimeUnit.MILLISECONDS);
-				if (integer == null)
-					continue;
+				integer = consumerQueue.take();
+//				integer = consumerQueue.poll(200, TimeUnit.MILLISECONDS);
+//				if (integer == null)
+//					continue;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

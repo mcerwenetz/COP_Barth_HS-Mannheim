@@ -18,7 +18,7 @@ public class OddEvenQueues {
 		Sum evensum = new Sum(0);
 		Sum oddSum = new Sum(0);
 
-		ProducerThread[] prods = new ProducerThread[10];
+		ProducerThread[] prods = new ProducerThread[1];
 		a2.t4.ConsumerThread even = new a2.t4.ConsumerThread(conDone, evenConsumerQueue, evensum);
 		a2.t4.ConsumerThread odd = new a2.t4.ConsumerThread(conDone, oddConsumerQueue, oddSum);
 		Distributer d = new Distributer(prodDone, prodDistQueue, oddConsumerQueue, evenConsumerQueue);

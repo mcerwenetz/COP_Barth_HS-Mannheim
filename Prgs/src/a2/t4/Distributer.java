@@ -26,10 +26,11 @@ public class Distributer extends Thread {
 		Integer integer = 0;
 		while (!prodDone.get() || !prodDistQueue.isEmpty()) {
 			try {
-				integer = prodDistQueue.poll(100, TimeUnit.MILLISECONDS);
-				if (integer == null) {
-					continue;
-				}
+//				integer = prodDistQueue.poll(100, TimeUnit.MILLISECONDS);
+				integer=prodDistQueue.take();
+//				if (integer == null) {
+//					continue;
+//				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

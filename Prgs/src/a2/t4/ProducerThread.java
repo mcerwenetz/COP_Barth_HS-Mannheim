@@ -19,7 +19,7 @@ public class ProducerThread extends Thread {
 	@Override
 	public void run() {
 		Random rand = new Random();
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 2; i++) {
 			Integer a = Math.abs(rand.nextInt() % 400);
 			queue.add(a);
 			Util.sleep(4);
