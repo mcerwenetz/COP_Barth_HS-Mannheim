@@ -1,4 +1,4 @@
-package script_examples.chap4;
+package script_examples.chap4.prodcon;
 
 import java.util.LinkedList;
 import java.util.Queue;
