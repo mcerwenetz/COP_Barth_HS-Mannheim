@@ -15,9 +15,9 @@ public class Sum {
 		super();
 		this.sum = sum;
 	}
-	
+
 	public void increaseBy(Integer by) {
-		sum+=by;
+		sum += by;
 	}
 
 	@Override
