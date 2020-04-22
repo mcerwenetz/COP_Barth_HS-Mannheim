@@ -1,14 +1,18 @@
 package script_examples.chap6;
 
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import script_examples.Util;
 
 public class Col {
 	public static void main(String[] args) {
 		List<Integer> list = Collections.synchronizedList(new LinkedList<Integer>());
+		final AtomicInteger sum = new AtomicInteger();
+		
 		Runnable drain = () -> {
 			try {
 				synchronized (list) {
@@ -20,13 +24,27 @@ public class Col {
 				System.out.println("Ouch\n");
 			}
 		};
+		
+		Runnable summing = () -> {
+			try {
+				for (Integer integer : list) {
+					sum.addAndGet(integer);
+				}
+			} catch (ConcurrentModificationException e) {
+				System.out.println("Ouch");
+			}
+		};
+		
 		for (int i = 0; i < 1000000; i++) {
 			list.add(Integer.valueOf(17));
 		}
 		Thread[] ts = new Thread[10];
 		for (int i = 0; i < ts.length; i++) {
-			ts[i] = new Thread(drain);
+			ts[i] = new Thread(summing);
 			ts[i].start();
+		}
+		for (int i = 0; i < 1000000; i++) {
+			list.add(Integer.valueOf(17));
 		}
 		Util.joinall(ts);
 	}
