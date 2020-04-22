@@ -27,8 +27,10 @@ public class Col {
 		
 		Runnable summing = () -> {
 			try {
-				for (Integer integer : list) {
-					sum.addAndGet(integer);
+				synchronized (list) {
+					for (Integer integer : list) {
+						sum.addAndGet(integer);
+					}
 				}
 			} catch (ConcurrentModificationException e) {
 				System.out.println("Ouch");
