@@ -11,7 +11,7 @@ public class Col {
 		List<Integer> list = Collections.synchronizedList(new LinkedList<Integer>());
 		Runnable drain = () -> {
 			try {
-				while(list.isEmpty()) {
+				while(!list.isEmpty()) {
 					list.remove(0);
 				}
 			} catch (IndexOutOfBoundsException e) {
