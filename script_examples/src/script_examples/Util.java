@@ -30,4 +30,15 @@ public class Util {
 			System.out.println("Util.join: Interrupt joining");
 		}
 	}
+
+	public static void joinall(Thread[] ts) {
+		for (Thread thread : ts) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 }
