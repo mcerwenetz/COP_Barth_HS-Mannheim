@@ -12,7 +12,7 @@ public class Col {
 	public static void main(String[] args) {
 		List<Integer> list = Collections.synchronizedList(new LinkedList<Integer>());
 		final AtomicInteger sum = new AtomicInteger();
-		
+
 		Runnable drain = () -> {
 			try {
 				synchronized (list) {
@@ -24,19 +24,17 @@ public class Col {
 				System.out.println("Ouch\n");
 			}
 		};
-		
+
 		Runnable summing = () -> {
-			try {
-				synchronized (list) {
-					for (Integer integer : list) {
-						sum.addAndGet(integer);
-					}
-				}
-			} catch (ConcurrentModificationException e) {
-				System.out.println("Ouch");
+			List<Integer> locaList;
+			synchronized (list) {
+				locaList = new LinkedList<Integer>(list);
+			}
+			for (Integer integer : locaList) {
+				sum.addAndGet(integer);
 			}
 		};
-		
+
 		for (int i = 0; i < 1000000; i++) {
 			list.add(Integer.valueOf(17));
 		}
@@ -48,6 +46,7 @@ public class Col {
 		for (int i = 0; i < 1000000; i++) {
 			list.add(Integer.valueOf(17));
 		}
+		System.out.println(sum);
 		Util.joinall(ts);
 	}
 }
