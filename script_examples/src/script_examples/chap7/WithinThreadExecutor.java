@@ -13,7 +13,7 @@ public class WithinThreadExecutor implements Executor {
 	}
 
 	public static void main(String[] args) {
-		Executor executor = new WithinThreadExecutor();
+		Executor executor = new TPTExecutor();
 		CountDownLatch latch = new CountDownLatch(4);
 		Util.resetTime();
 
