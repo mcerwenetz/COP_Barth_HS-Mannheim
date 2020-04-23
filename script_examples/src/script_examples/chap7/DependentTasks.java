@@ -9,7 +9,8 @@ import java.util.concurrent.FutureTask;
 public class DependentTasks {
 	
 //	static ExecutorService es = Executors.newSingleThreadExecutor();
-	static ExecutorService es = Executors.newCachedThreadPool();
+//	static ExecutorService es = Executors.newCachedThreadPool();
+	static ExecutorService es = Executors.newFixedThreadPool(10);
 	static FutureTask<Integer> genFac(final int i){
 		Callable<Integer> ret = () -> {
 			if(i==1)
