@@ -15,12 +15,13 @@ public class Application implements Runnable {
 	@Override
 	public void run() {
 		try {
-			System.out.println(name + " started");
-			Thread.sleep(1000);
+			System.out.println(name + " is ready");
+			countDownLatch.countDown();
+			countDownLatch.await();
+			System.out.println(name + " runs");
 		} catch (InterruptedException e) {
 			System.out.println(e.getMessage());
 		}
-		System.out.println(name + " is up and running.");
 		countDownLatch.countDown();
 	}
 }
