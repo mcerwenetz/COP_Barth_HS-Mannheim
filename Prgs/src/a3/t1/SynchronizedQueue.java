@@ -30,4 +30,8 @@ public class SynchronizedQueue<T> implements Iterable<T> {
 		return queue.iterator();
 	}
 	
+	public T peek() {
+		return queue.peek();
+	}
+
 }
