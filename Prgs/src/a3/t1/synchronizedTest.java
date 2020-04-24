@@ -19,8 +19,6 @@ class synchronizedTest {
 		SynchronizedQueue<Integer> queue = MyCollections.synchronizedQueue(list);
 		final ExpectedException exception = ExpectedException.none();
 		
-		queue.offer(0);
-
 		
 		Runnable r = () -> {
 			for (int i = 0; i < 10; i++) {
