@@ -18,48 +18,46 @@ public class BenchMap {
 		Random random=new Random();
 		List<Integer> intList = new ArrayList<Integer>();
 		int size=1_000_000;
-		int maxIndex = size-1;
-
 		
 		for (int i = 0; i < size; i++) {
 			intList.add(random.nextInt());
 		}
 		
 		util.Util.resetTime();
-		for (Integer integer : intList) {
-			hashMap.put(intList.get(random.nextInt(maxIndex)), intList.get(random.nextInt(maxIndex)));
-		}
-		
-		for (Integer integer : intList) {
-			hashMap.remove(intList.get(random.nextInt(maxIndex)));
-		}
+		fillMap(intList, hashMap);
+		emptyMap(intList, hashMap);
 		Long timeHashmap = util.Util.getTimeMilis();
-		System.out.println("This took " + timeHashmap + " on the HashMap");
 		
 		
 		util.Util.resetTime();
-		for (Integer integer : intList) {
-			synchronizedHashMap.put(intList.get(random.nextInt(maxIndex)), intList.get(random.nextInt(maxIndex)));
-		}
-		
-		for (Integer integer : intList) {
-			synchronizedHashMap.remove(intList.get(random.nextInt(maxIndex)));
-		}
+		fillMap(intList, synchronizedHashMap);
+		emptyMap(intList, synchronizedHashMap);
 		Long timeSynchronizedMap = util.Util.getTimeMilis();
-		System.out.println("This took " + timeHashmap + " on the synchronized HashMap");
 		
 		util.Util.resetTime();
-		for (Integer integer : intList) {
-			concurrentHashMap.put(intList.get(random.nextInt(maxIndex)), intList.get(random.nextInt(maxIndex)));
-		}
-		
-		for (Integer integer : intList) {
-			concurrentHashMap.remove(intList.get(random.nextInt(maxIndex)));
-		}
+		fillMap(intList, concurrentHashMap);
+		emptyMap(intList, concurrentHashMap);
 		Long timeConcurrentHashMap = util.Util.getTimeMilis();
-		System.out.println("This took " + timeHashmap + " on the concurrent HashMap");
 		
 		
+		System.out.println("This took " + timeHashmap + " ms on the HashMap");
+		System.out.println("This took " + timeSynchronizedMap + "ms on the synchronized HashMap");
+		System.out.println("This took " + timeConcurrentHashMap + "ms on the concurrent HashMap");
+		
+		
+	}
+
+	private static void emptyMap(List<Integer> intList, Map<Integer, Integer> map) {
+		for (Integer integer : intList) {
+			map.remove(integer);
+		}
+	}
+
+	private static void fillMap(List<Integer> intList, Map<Integer, Integer> map) {
+		Random random = new Random();
+		for (Integer integer : intList) {
+			map.put(integer, intList.get(random.nextInt(intList.size()-1)));
+		}
 	}
 
 }
