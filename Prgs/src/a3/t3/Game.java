@@ -19,7 +19,6 @@ public class Game {
 	}
 
 
-
 	public void setWinner(Player winner) {
 		this.winner = winner;
 	}
