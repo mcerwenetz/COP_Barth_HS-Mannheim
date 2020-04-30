@@ -44,11 +44,11 @@ class ProbablePrime {
 				primeThreads[i.intValue() % chargengroesse] = new PrimeCounterThreadSingle(i, primes, lock, sem);
 			}
 			// Alle Threads in einer charge starten
-			for (var i : primeThreads) {
+			for (Thread i : primeThreads) {
 				i.start();
 			}
 			// Alle Threads in einer charge joinen
-			for (var i : primeThreads) {
+			for (Thread i : primeThreads) {
 				Util.join(i);
 			}
 			// zaehler um charge erhöhen
