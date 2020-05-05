@@ -1,41 +1,38 @@
 package a3.t4;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyExecutor implements Executor {
 
 	Integer numberOfThreads;
-	List<Runnable> cachedRunnables = new LinkedList<Runnable>();
-	ExecutorService ex;
-	ExecutorCompletionService<Void> ecs;
-	AtomicInteger atomicInteger = new AtomicInteger(0);
+	AtomicInteger numberOfSubmittedRunnables;
+	long keepAliveTime;
+	BlockingQueue<Runnable> workQueue;
+	MyThreadPoolExecutor myThreadPoolExecutor;
+	Integer queueWasFull;
 
-	public MyExecutor(Integer numberOfThreads) {
-		this.numberOfThreads = numberOfThreads;
-		ex = Executors.newFixedThreadPool(numberOfThreads);
-		ecs = new ExecutorCompletionService<Void>(ex);
+	public MyExecutor(Integer maximumPoolSize) {
+		this.numberOfThreads = maximumPoolSize;
+		this.numberOfSubmittedRunnables = new AtomicInteger(0);
+		this.keepAliveTime = 100;
+		workQueue = new LinkedBlockingQueue<Runnable>();
+		myThreadPoolExecutor = new MyThreadPoolExecutor(0, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
+				workQueue, numberOfSubmittedRunnables);
+		queueWasFull=0;
 	}
 
 	@Override
 	public void execute(Runnable command) {
-		if (this.cachedRunnables.size() > numberOfThreads) {
-			System.out.println("Queue full");
+		if (this.numberOfSubmittedRunnables.get() >= numberOfThreads) {
+//			System.out.println("Queue full");
+			queueWasFull++;
 			return;
 		} else {
-			cachedRunnables.add(command);
-			Runnable myRunnable = () -> {
-				cachedRunnables.remove(command);
-				ecs.submit(command,null);
-				System.out.println(command + "submitted");
-				this.atomicInteger.incrementAndGet();
-			};
-			ecs.submit(myRunnable, null);
+			myThreadPoolExecutor.submit(command);
 		}
 
 	}
