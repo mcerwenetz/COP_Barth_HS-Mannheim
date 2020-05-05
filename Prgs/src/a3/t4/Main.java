@@ -1,23 +1,23 @@
 package a3.t4;
-import util.*;
 
 public class Main {
 
 	public static void main(String[] args) {
 		MyExecutor myExecutor = new MyExecutor(1);
-		
-		
-		for (int i = 100; i > 0; i--) {
-			Runnable r = () ->{
-				Util.sleep(1000);
-//				System.out.println("Sleep 1000");
+
+		int i = 1_000_000;
+		while (i-- > 0) {
+			Runnable run = () -> {
+//				System.out.println("running");
+//				Util.sleep(1000);
+
 			};
-			
-			myExecutor.execute(r);
+			myExecutor.execute(run);
+
 		}
-		
-		myExecutor.ex.shutdown();
-		System.out.println("Overall executed: " + myExecutor.atomicInteger);
+
+		myExecutor.myThreadPoolExecutor.shutdown();
+		System.out.println("Queue limit reached " + myExecutor.queueWasFull + " times");
 	}
 
 }
