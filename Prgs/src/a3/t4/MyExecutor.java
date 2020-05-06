@@ -1,53 +1,102 @@
 package a3.t4;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MyExecutor implements Executor {
 
 	Integer maxThreads;
-	AtomicInteger runningThreads;
-	Integer limitReached=0;
+	Integer limitReached = 0;
 	private Boolean doBlock;
+	Queue<Runnable> runnables;
+	Lock lock;
+	Condition condition;
+	AtomicBoolean shutdown;
+	Queue<Thread> threads;
 
 	public MyExecutor(Integer maxThreads) {
+
+		Runnable doWork = () -> {
+			while (!shutdown.get()) {
+				try {
+					lock.lock();
+					while (runnables.isEmpty()) {
+						condition.await();
+					}
+					if (shutdown.get()) {
+						break;
+					}
+					Runnable r = runnables.poll();
+					r.run();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} finally {
+					lock.unlock();
+				}
+			}
+		};
+
+		lock = new ReentrantLock();
+		condition = lock.newCondition();
 		this.maxThreads = maxThreads;
-		this.runningThreads = new AtomicInteger(0);
-		doBlock=true;
+		doBlock = true;
+		shutdown = new AtomicBoolean(false);
+		runnables = new LinkedList<Runnable>();
+		threads = new LinkedList<Thread>();
+
+		for (int i = 0; i < maxThreads; i++) {
+			Thread t = new Thread(doWork);
+			t.start();
+			threads.add(t);
+		}
+
 	}
-	
+
 	public void doBlock(Boolean block) {
 		this.doBlock = block;
 	}
 
 	@Override
 	public void execute(Runnable command) {
-		if (runningThreads.get() >= maxThreads) {
-			if(doBlock) {
-//			System.out.println("Queue full");
+		if (runnables.size() >= maxThreads) {
 			limitReached++;
-			return;
-			}
-			else {
+			if (doBlock) {
+				System.out.println("Queue full");
+				return;
+			} else {
 				throw new RejectedExecutionException();
 			}
 		} else {
-			Thread t = new Thread(command);
-			t.start();
-			runningThreads.incrementAndGet();
-			Runnable r = () -> {
-				try {
-					t.join();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				runningThreads.decrementAndGet();
-			};
-			Thread finisher = new Thread(r);
-			finisher.start();
+			try {
+				lock.lock();
+				runnables.add(command);
+				condition.signalAll();
+			} finally {
+				lock.unlock();
+			}
 		}
 
+	}
+
+	public void shutdown() {
+		shutdown.set(true);
+		for (Thread thread : threads) {
+			try {
+				lock.lock();
+				condition.signalAll();
+			} finally {
+				lock.unlock();
+			}
+			try {
+				thread.join();
+			} catch (Exception e) {
+			}
+		}
 	}
 }
