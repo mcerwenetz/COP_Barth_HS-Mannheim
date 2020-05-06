@@ -3,21 +3,19 @@ package a3.t4;
 public class Main {
 
 	public static void main(String[] args) {
-		MyExecutor myExecutor = new MyExecutor(1);
-
-		int i = 1_000_000;
-		while (i-- > 0) {
-			Runnable run = () -> {
-//				System.out.println("running");
-//				Util.sleep(1000);
-
-			};
-			myExecutor.execute(run);
-
+		
+		MyExecutor myExecutor = new MyExecutor(4);
+		
+		Runnable r = new Runnable() {
+			public void run() {
+				System.out.println("running");
+			}
+		};
+		
+		for (int i = 0; i < 1000; i++) {
+			myExecutor.execute(r);
 		}
-
-		myExecutor.myThreadPoolExecutor.shutdown();
-		System.out.println("Queue limit reached " + myExecutor.queueWasFull + " times");
+		System.out.println("Limit reached " + myExecutor.limitReached + " times");
 	}
 
 }
