@@ -1,40 +1,41 @@
 package a3.t4;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyExecutor implements Executor {
 
-	Integer numberOfThreads;
-	AtomicInteger numberOfSubmittedRunnables;
-	long keepAliveTime;
-	BlockingQueue<Runnable> workQueue;
-	MyThreadPoolExecutor myThreadPoolExecutor;
-	Integer queueWasFull;
+	Integer maxThreads;
+	AtomicInteger runningThreads;
+	Integer limitReached=0;
 
-	public MyExecutor(Integer maximumPoolSize) {
-		this.numberOfThreads = maximumPoolSize;
-		this.numberOfSubmittedRunnables = new AtomicInteger(0);
-		this.keepAliveTime = 100;
-		workQueue = new LinkedBlockingQueue<Runnable>();
-		myThreadPoolExecutor = new MyThreadPoolExecutor(0, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
-				workQueue, numberOfSubmittedRunnables);
-		queueWasFull=0;
+	public MyExecutor(Integer maxThreads) {
+		this.maxThreads = maxThreads;
+		this.runningThreads = new AtomicInteger(0);
 	}
 
 	@Override
 	public void execute(Runnable command) {
-		if (this.numberOfSubmittedRunnables.get() >= numberOfThreads) {
+		if (runningThreads.get() >= maxThreads) {
 //			System.out.println("Queue full");
-			queueWasFull++;
+			limitReached++;
 			return;
 		} else {
-			myThreadPoolExecutor.submit(command);
+			Thread t = new Thread(command);
+			t.start();
+			runningThreads.incrementAndGet();
+			Runnable r = () -> {
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				runningThreads.decrementAndGet();
+			};
+			Thread finisher = new Thread(r);
+			finisher.start();
 		}
 
 	}
-
 }
