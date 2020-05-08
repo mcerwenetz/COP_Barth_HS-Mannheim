@@ -2,6 +2,8 @@ package a3.t4;
 
 import java.util.concurrent.RejectedExecutionException;
 
+import util.Util;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -10,11 +12,12 @@ public class Main {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				System.out.println("running");
+				Util.sleep(10);
+				System.out.println("runnable running");
 			}
 		};
 
-		myExecutor.doBlock(false);
+		myExecutor.doBlock(true);
 		for (int i = 0; i < 10; i++) {
 			try {
 				myExecutor.execute(r);
@@ -23,7 +26,7 @@ public class Main {
 			}
 		}
 		myExecutor.shutdown();
-		System.out.println("Limit reached " + myExecutor.limitReached + " times");
+//		System.out.println("Limit reached " + myExecutor.limitReached + " times");
 	}
 
 }
