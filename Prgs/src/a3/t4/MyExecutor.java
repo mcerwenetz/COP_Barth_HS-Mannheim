@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -11,36 +12,17 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class MyExecutor implements Executor {
 
-	Integer maxThreads;
-	Integer limitReached = 0;
-	private Boolean doBlock;
+	int maxThreads;
+	int limitReached = 0;
+	private boolean doBlock;
 	Queue<Runnable> runnables;
 	Lock lock;
 	Condition condition;
 	AtomicBoolean shutdown;
-	Queue<Thread> threads;
+	Thread[] threads;
+	Semaphore sem;
 
 	public MyExecutor(Integer maxThreads) {
-
-		Runnable doWork = () -> {
-			while (!shutdown.get()) {
-				try {
-					lock.lock();
-					while (runnables.isEmpty()) {
-						condition.await();
-					}
-					if (shutdown.get()) {
-						break;
-					}
-					Runnable r = runnables.poll();
-					r.run();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					lock.unlock();
-				}
-			}
-		};
 
 		lock = new ReentrantLock();
 		condition = lock.newCondition();
@@ -48,12 +30,15 @@ public class MyExecutor implements Executor {
 		doBlock = true;
 		shutdown = new AtomicBoolean(false);
 		runnables = new LinkedList<Runnable>();
-		threads = new LinkedList<Thread>();
+		threads = new Thread[maxThreads];
+		sem=new Semaphore(this.maxThreads);
 
 		for (int i = 0; i < maxThreads; i++) {
-			Thread t = new Thread(doWork);
-			t.start();
-			threads.add(t);
+			threads[i] = new DoWorkThread(condition, shutdown, runnables, lock, sem);
+		}
+
+		for (Thread thread : threads) {
+			thread.start();
 		}
 
 	}
@@ -64,22 +49,20 @@ public class MyExecutor implements Executor {
 
 	@Override
 	public void execute(Runnable command) {
-		if (runnables.size() >= maxThreads) {
-			limitReached++;
-			if (doBlock) {
-				System.out.println("Queue full");
-				return;
-			} else {
+
+		boolean acquiered=false;
+		while (!acquiered) {
+			acquiered=sem.tryAcquire();
+			if (!acquiered && doBlock) {
 				throw new RejectedExecutionException();
 			}
-		} else {
-			try {
-				lock.lock();
-				runnables.add(command);
-				condition.signalAll();
-			} finally {
-				lock.unlock();
-			}
+		}
+		try {
+			lock.lock();
+			runnables.add(command);
+			condition.signalAll();
+		} finally {
+			lock.unlock();
 		}
 
 	}
