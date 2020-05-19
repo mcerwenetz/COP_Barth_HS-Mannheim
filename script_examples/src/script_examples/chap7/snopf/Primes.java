@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class Primes {
@@ -43,5 +46,28 @@ public class Primes {
 			}
 		}
 		return minkey;
+	}
+	
+	static BigInteger parSNOPF(List<BigInteger> ns) {
+		final Map<BigInteger, Integer> sizes = new ConcurrentHashMap<BigInteger, Integer>();
+		final ExecutorService es = Executors.newFixedThreadPool(16);
+		for(final BigInteger n : ns) {
+			es.execute(() -> {
+				sizes.put(n, primeFactors(n).size());
+			});
+		}
+		joinExecutor(es);
+		return keyMinValue(sizes);
+	}
+
+
+	private static void joinExecutor(ExecutorService es) {
+		es.shutdown();
+		try {
+			es.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 }
