@@ -3,16 +3,16 @@ package script_examples.chap7.ForkJoin;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 
 
-public class CountPrimeFactors implements Callable<Integer> {
-	static ExecutorService es = Executors.newFixedThreadPool(2);
-
+public class CountPrimeFactors extends  RecursiveTask<Integer>{
+	//static ExecutorService es = Executors.newFixedThreadPool(2);
+	//neuer ForkJoinPool erlaubt rekursives aufrufen.
+	//Argument ist paralellism. 2 Threads dürfen gleichzeitig laufen. Alle anderen werden pausiert
+	ForkJoinPool forkJoinPool = new ForkJoinPool(2);
 	private List<BigInteger> ns;
 	
 	public CountPrimeFactors(List<BigInteger> ns) {
@@ -20,7 +20,8 @@ public class CountPrimeFactors implements Callable<Integer> {
 	}
 	
 	@Override
-	public Integer call() throws Exception {
+	//Neue Methode compute statt call
+	public Integer compute() {
 		if (ns.isEmpty()) {
 			return 0;
 		} else {
@@ -32,12 +33,10 @@ public class CountPrimeFactors implements Callable<Integer> {
 			int headCount = Primes.primeFactors(head).size();
 			//neues CountPrimeFactors Callable
 			CountPrimeFactors rec = new CountPrimeFactors(ns);
-			//erstelle einen future-task mit dem callable (gleiches wie hier nur mit Liste ohne head-element)
-			FutureTask<Integer> ft = new FutureTask<>(rec);
-			//Gibt FutureTask an Executorservice
-			es.submit(ft);
-			//rekursives return
-			return headCount + ft.get();
+			//invokeAll wartet biss alle computes aller Tasks gelaufen sind
+			invokeAll(rec);
+			//join gibt hier das resultat von compute zurück sobald eins vorliegt
+			return headCount + rec.join();
 		}
 	}
 	
@@ -48,14 +47,12 @@ public class CountPrimeFactors implements Callable<Integer> {
 		}
 		Integer result = null;
 		CountPrimeFactors count = new CountPrimeFactors(ns);
-		try {
-			result = count.call();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//Run the first task (run all others recursivly)
+		count.forkJoinPool.invoke(count);
+		//Warte wird beschrieben sobald count auch wirklich mit allen fertig ist.
+		result = count.join();
+		//Ausgabe
 		System.out.println(result);
-		CountPrimeFactors.es.shutdown();
 	}
 
 }
