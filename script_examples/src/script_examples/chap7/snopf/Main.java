@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import script_examples.Util;
-import script_examples.chap7.snopf.Primes;
 
 public class Main {
 	public static void main(String[] args) {
 		List<BigInteger> ns = new ArrayList<BigInteger>();
 		int start=1_000_000;
-		int no = 1000;
+		int no = 100;
 		for (int i = start; i < start+no; i++) {
 			String sval= Integer.valueOf(i).toString();
 			ns.add(new BigInteger(sval));

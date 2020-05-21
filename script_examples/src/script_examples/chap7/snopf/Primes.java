@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+
 public class Primes {
 
 	static List<BigInteger> primeFactors(BigInteger n){
@@ -115,9 +116,11 @@ public class Primes {
 		for ( final BigInteger n : ns) {
 			es.execute(() -> {
 				int size =primeFactors(n, bound.get()).size();
-				sizes.put(n, size);
-				if(size < bound.get()) {
-					bound.set(size);
+				sizes.put(n, size);				
+				int currentBound = bound.get();
+				while (size < currentBound) {
+					bound.compareAndSet(currentBound, size);
+					currentBound = bound.get();
 				}
 			});
 		}
