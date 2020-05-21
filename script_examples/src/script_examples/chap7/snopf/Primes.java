@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Primes {
@@ -70,4 +71,58 @@ public class Primes {
 		}
 		
 	}
+	
+	static BigInteger seqBoundSnopf(List<BigInteger> ns) {
+		Map<BigInteger, Integer> sizes = new ConcurrentHashMap<BigInteger, Integer>();
+		BigInteger minn = ns.get(0);
+		int size = primeFactors(minn).size();
+		AtomicInteger bound = new AtomicInteger(size);
+		for (BigInteger n : ns) {
+			size =primeFactors(n, bound.get()).size();
+			sizes.put(n, size);
+			if(size < bound.get()) {
+				bound.set(size);
+			}
+		}
+		return keyMinValue(sizes);
+	}
+
+
+	private static List<BigInteger> primeFactors(BigInteger n, int bound) {
+		BigInteger i = new BigInteger("2");
+		List<BigInteger> factors = new ArrayList<BigInteger>();
+		while (n.compareTo(BigInteger.ONE) > 0) {
+			while (n.mod(i).equals(BigInteger.ZERO)) {
+				n=n.divide(i);
+				factors.add(i);
+				if(factors.size() >= bound) {
+					factors.add(BigInteger.ZERO);
+					return factors;
+				}
+			}
+			i = i.add(BigInteger.ONE);
+		}
+		return factors;
+	}
+	
+	
+	static BigInteger parrBoundSNOPF(List<BigInteger> ns) {
+		final Map<BigInteger, Integer> sizes = new ConcurrentHashMap<BigInteger, Integer>();
+		final ExecutorService es = Executors.newFixedThreadPool(16);
+		BigInteger minn = ns.get(0);
+		int initsize = primeFactors(minn).size();
+		final AtomicInteger bound = new AtomicInteger(initsize);
+		for ( final BigInteger n : ns) {
+			es.execute(() -> {
+				int size =primeFactors(n, bound.get()).size();
+				sizes.put(n, size);
+				if(size < bound.get()) {
+					bound.set(size);
+				}
+			});
+		}
+		joinExecutor(es);
+		return keyMinValue(sizes);
+	}
+	
 }

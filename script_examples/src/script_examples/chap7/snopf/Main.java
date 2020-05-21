@@ -26,5 +26,15 @@ public class Main {
 		BigInteger parsnopf = Primes.parSNOPF(ns);
 		used = Util.getTimeMilis();
 		System.out.println("Paralelles Snopf braucht " + used + "ms");
+		
+		Util.resetTime();
+		BigInteger seqWithBound =Primes.seqBoundSnopf(ns);
+		used=Util.getTimeMilis();
+		System.out.println("Sequenzielles mit bound braucht " + used + "ms");
+		
+		Util.resetTime();
+		BigInteger parrBoundSNOPF =Primes.parrBoundSNOPF(ns);
+		used=Util.getTimeMilis();
+		System.out.println("Paralelles mit bound braucht " + used + "ms");
 	}
 }
