@@ -10,7 +10,7 @@ public class Main {
 	public static void main(String[] args) {
 		List<BigInteger> ns = new ArrayList<BigInteger>();
 		int start=1_000_000;
-		int no = 100;
+		int no = 200;
 		for (int i = start; i < start+no; i++) {
 			String sval= Integer.valueOf(i).toString();
 			ns.add(new BigInteger(sval));
@@ -35,5 +35,7 @@ public class Main {
 		BigInteger parrBoundSNOPF =Primes.parrBoundSNOPF(ns);
 		used=Util.getTimeMilis();
 		System.out.println("Paralelles mit bound braucht " + used + "ms");
+		
+		System.out.println("Total number of primefactors " + Primes.recCountFactors(ns));
 	}
 }
