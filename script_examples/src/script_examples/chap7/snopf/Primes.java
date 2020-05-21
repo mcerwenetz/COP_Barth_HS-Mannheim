@@ -108,17 +108,34 @@ public class Primes {
 	
 	
 	static BigInteger parrBoundSNOPF(List<BigInteger> ns) {
+		//ns ist die Liste an BigIntegern für die die Anzahl der Faktoren bestimmt werden soll.
+		//der mit den wenigsten Faktoren wird zurückgegeben
+		//sizes ist die Map in der Zahlen und deren Faktoranzahl drauf gemapped wird.
 		final Map<BigInteger, Integer> sizes = new ConcurrentHashMap<BigInteger, Integer>();
-		final ExecutorService es = Executors.newFixedThreadPool(16);
+		//ExecutorService für die Tasks später.
+		final ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		//minh ist das Erste Element der mitgegebenen Liste an Zahlen
 		BigInteger minn = ns.get(0);
+		//für die erste Zahl wird die Size ermittelt, damit die bound gesetzt werden kann.
+		//Da hier noch keine Bound steht erfolgt auch der Aufruf noch ohne Bound
 		int initsize = primeFactors(minn).size();
+		//Bound wird erstellt. Atomic weil Sie später im Task gebraucht wird.
 		final AtomicInteger bound = new AtomicInteger(initsize);
+		//Schleife über alle Zahlen in der Liste. Paralell mit executorService damit
+		//mehrere gleichzeitig drauf zugreifen können. ns wird nur gelesen deswegen kein Atomic.
+		//sizes ist ne ConcurrentHashMap und bringt wechselseitigen Ausschluss schon mit.
 		for ( final BigInteger n : ns) {
 			es.execute(() -> {
+				//size ist die Anzahl an Primfaktoren. Hier wird die Bound jetzt benutzt
+				//In primeFactors wird pro Iteration abgefragt ob die Anzahl der Faktoren schon bound exceeded.
+				//falls ja heißt das ja dass die Zahl schonmal nicht die wenigste Anzahl Faktoren hat.
 				int size =primeFactors(n, bound.get()).size();
-				sizes.put(n, size);				
+				//Size in hasmap eintragen.
+				sizes.put(n, size);
 				int currentBound = bound.get();
+				//Falls die Bound größer ist als die größe des aktuellen Elements gibt es ein neues Minimum.
 				while (size < currentBound) {
+					//So lange auf änderung spinnen bis Sie erfolgt ist.
 					bound.compareAndSet(currentBound, size);
 					currentBound = bound.get();
 				}
