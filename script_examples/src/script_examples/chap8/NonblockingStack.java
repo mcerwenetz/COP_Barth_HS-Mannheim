@@ -1,5 +1,6 @@
 package script_examples.chap8;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class NonblockingStack<T> {
@@ -53,5 +54,25 @@ public class NonblockingStack<T> {
 			ok = head.compareAndSet(oldHead, newHead);
 		} while (!ok);
 		return oldHead.element;
+	}
+
+	
+	public static void main(String[] args) {
+		AtomicInteger counterval = new AtomicInteger(0);
+		NonblockingStack<Integer> nbs = new NonblockingStack<>();
+		
+		Runnable runnable = new Runnable() {
+			
+			@Override
+			public void run() {
+				counterval.get();
+				nbs.push(counterval.get() +1 );
+				counterval.getAndIncrement();
+			}
+		};
+		
+		new Thread(runnable).start();
+		new Thread(runnable).start();
+
 	}
 }
