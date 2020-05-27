@@ -1,9 +1,9 @@
 package script_examples.chap8;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class NonblockingStack<T> {
+	
 	private static class Node<T> {
 		// Element ist final
 		// wir wollen den Stack benutzen,
@@ -16,6 +16,7 @@ public class NonblockingStack<T> {
 			this.element = element;
 		}
 	}
+	
 
 	private AtomicReference<Node<T>> head;
 
@@ -44,9 +45,11 @@ public class NonblockingStack<T> {
 
 		boolean ok = false;
 		do {
-			//hier das gleiche wie bei push. Immer neu getten falls er sich in zwischenzeit geändert hat.
+			// hier das gleiche wie bei push. Immer neu getten falls er sich in zwischenzeit
+			// geändert hat.
 			oldHead = head.get();
-			//wenn der Stack leer ist soll natürlich auch kein Element zurückgeliefert werden.
+			// wenn der Stack leer ist soll natürlich auch kein Element zurückgeliefert
+			// werden.
 			if (oldHead == null) {
 				return null;
 			}
@@ -56,23 +59,9 @@ public class NonblockingStack<T> {
 		return oldHead.element;
 	}
 
-	
 	public static void main(String[] args) {
-		AtomicInteger counterval = new AtomicInteger(0);
-		NonblockingStack<Integer> nbs = new NonblockingStack<>();
-		
-		Runnable runnable = new Runnable() {
-			
-			@Override
-			public void run() {
-				counterval.get();
-				nbs.push(counterval.get() +1 );
-				counterval.getAndIncrement();
-			}
-		};
-		
-		new Thread(runnable).start();
-		new Thread(runnable).start();
-
+		NonblockingStack<Integer> stack = new NonblockingStack<>();
+		stack.push(1);
+		stack.pop();
 	}
 }
