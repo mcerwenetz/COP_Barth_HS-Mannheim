@@ -2,6 +2,7 @@ package network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -32,8 +33,13 @@ public class Server {
 						System.out.println("[Server] Client " + client.getRemoteSocketAddress() + " verbunden");
 
 						ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
-						String message = (String) objectInputStream.readObject();
-						System.out.println("[Server] Client sagt: " + message);
+						ObjectOutputStream objectOutputStream = new ObjectOutputStream(client.getOutputStream());
+						
+						Integer zahl1 = (Integer) objectInputStream.readObject();
+						Integer zahl2 = (Integer) objectInputStream.readObject();
+						Integer ergebnis = zahl1 + zahl2;
+						
+						objectOutputStream.writeObject(ergebnis);
 
 						client.close();
 						ss.close();
