@@ -1,8 +1,8 @@
 package a2.t4;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import util.Sum;
 
 public class ConsumerThread extends Thread {
