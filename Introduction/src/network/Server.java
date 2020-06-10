@@ -1,12 +1,9 @@
 package network;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
-
-import jdk.internal.jline.internal.InputStreamReader;
 
 public class Server {
 
@@ -33,16 +30,16 @@ public class Server {
 						System.out.println("[Server]Warten auf verbindung");
 						Socket client = ss.accept();
 						System.out.println("[Server] Client " + client.getRemoteSocketAddress() + " verbunden");
-						
-						Scanner scanner = new Scanner(client.getInputStream());
-						if (scanner.hasNextLine()) {
-							System.out.println("[Server] Message from client: " + scanner.nextLine());
-						}
-						
-						scanner.close();
+
+						ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
+						String message = (String) objectInputStream.readObject();
+						System.out.println("[Server] Client sagt: " + message);
+
 						client.close();
 						ss.close();
 					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					}
 				}
