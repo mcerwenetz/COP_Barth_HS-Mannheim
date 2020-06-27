@@ -9,20 +9,21 @@ import java.nio.ByteBuffer;
 
 public class Client {
 
-	public void clientSession(Socket socket) throws IOException {
+	public static void clientSession(Socket socket) throws IOException {
 		InputStream is = socket.getInputStream();
 		OutputStream os = socket.getOutputStream();
 
-		writeInt(os, 1);
+		writeInt(os, 16);
 		System.out.println("sent");
 		int value = readInt(is);
 		System.out.println("recieved");
+		System.out.println("value = " + value);
 
 		is.close();
 		os.close();
 	}
 
-	private int readInt(InputStream is) throws IOException {
+	static int readInt(InputStream is) throws IOException {
 		ByteBuffer bb = ByteBuffer.allocate(4);
 		int need = 4, read;
 		do {
@@ -36,7 +37,7 @@ public class Client {
 		return val;
 	}
 
-	private void writeInt(OutputStream os, int i) throws IOException {
+	static void writeInt(OutputStream os, int i) throws IOException {
 		ByteBuffer bb = java.nio.ByteBuffer.allocate(4);
 		bb.putInt(i);
 		os.write(bb.array());
@@ -50,9 +51,7 @@ public class Client {
 			String hostaddr = addr.getHostAddress();
 			int port = socket.getLocalPort();
 			System.out.println("client runs on "+hostaddr +" port "+ port);
-			while (true) {
-				
-			}
+			clientSession(socket);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
