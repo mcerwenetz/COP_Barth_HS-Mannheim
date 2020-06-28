@@ -31,8 +31,12 @@ public class CountPrimes extends AbstractActor {
 		Props props = CheckPrime.props();
 		//Context des Countprime actors
 		ActorContext context = getContext();
+		//Round Robin Pool der größe 4 erstellen
+		RouterConfig router = new RoundRobinPool(4);
+		//Routerprops für den Start der Kinder
+		Props rprops = props.withRouter(router);
 		//checkprime child erstellen
-		checkPrime = context.actorOf(props, "checker");
+		checkPrime = context.actorOf(rprops, "checker");
 		//kick-off message zum starten an den CountPrime Actor
 		getSelf().tell(Msg.START, getSelf());
 	}
