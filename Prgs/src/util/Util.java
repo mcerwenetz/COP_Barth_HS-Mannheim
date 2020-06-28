@@ -31,4 +31,20 @@ public class Util {
 			System.out.println("Util.join: Interrupt joining");
 		}
 	}
+
+	public static boolean isPrime(long n) {
+		long i,m=0;
+		m= (n/2);
+		if(n==0 || n == 1) {
+			return false;
+		}
+		else {
+			for (i = 2; i <= m; i++) {
+				if(n%i==0) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }
