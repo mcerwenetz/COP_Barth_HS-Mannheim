@@ -30,6 +30,7 @@ public class RunTwoCounter {
 		long time = Util.getTimeMilis();
 		System.out.println("took " + time + "ms");
 		Util.join(tpeakerThread);
+		System.out.println(diffs);
 		
 		//With unsafe counters beneath but they are synronized so still savw
 		counter = new TwoCounterSafeEff();
