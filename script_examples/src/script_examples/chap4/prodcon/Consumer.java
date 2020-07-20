@@ -46,7 +46,6 @@ public class Consumer extends Thread {
 					}
 					val = queue.remove();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
 				}
 			if(val != null) {
