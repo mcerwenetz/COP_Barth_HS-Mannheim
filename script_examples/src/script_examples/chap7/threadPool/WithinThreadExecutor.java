@@ -27,12 +27,12 @@ public class WithinThreadExecutor implements Executor {
 				@Override
 				public void run() {
 //				System.out.println("Hello from Runnable");
-					cl.countDown();
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException ignored) {
 					}
 					System.out.println("slept 100ms");
+					cl.countDown();
 				}
 			};
 
