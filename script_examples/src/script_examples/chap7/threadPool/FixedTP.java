@@ -11,11 +11,11 @@ public class FixedTP {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		ExecutorService threadpool = Executors.newCachedThreadPool();
+		ExecutorService threadpool = Executors.newFixedThreadPool(2);
 
 		List<Callable<Void>> callables = new LinkedList<Callable<Void>>();
 		
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 30; i++) {
 		
 			Callable<Void> callable = new Callable<Void>() {
 
