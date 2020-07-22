@@ -1,21 +1,19 @@
 package script_examples.chap7.threadPool;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class FixedTP {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		ExecutorService threadpool = Executors.newFixedThreadPool(2);
+		ExecutorService threadpool = Executors.newCachedThreadPool();
+		ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<Void>(threadpool);
 
-		List<Callable<Void>> callables = new LinkedList<Callable<Void>>();
 		
-		for (int i = 0; i < 30; i++) {
+		for (int i = 0; i < 3; i++) {
 		
 			Callable<Void> callable = new Callable<Void>() {
 
@@ -27,21 +25,16 @@ public class FixedTP {
 				}
 			};
 
-			callables.add(callable);
+			executorCompletionService.submit(callable);
 		}
 		
-		try {
-			threadpool.invokeAll(callables);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-			 
-		try {
-			threadpool.awaitTermination(2, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (int i = 0; i < 3; i++) {
+			try {
+				executorCompletionService.take();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		threadpool.shutdown();
 	}
