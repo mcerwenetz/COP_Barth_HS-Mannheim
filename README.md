@@ -1,0 +1,1 @@
+# COP_Barth_HS-Mannheim
