@@ -8,13 +8,17 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import sun.invoke.empty.Empty;
+
 public class SignalAwait {
 
 	Integer queueBound = 10;
 	Lock lock = new ReentrantLock();
 	Condition full = lock.newCondition();
+	Condition empty = lock.newCondition();
 	Queue<Integer> queue = new LinkedList<Integer>();
 	volatile boolean keealive = true;
+	private static final int CAP = 5;
 
 	public class Consumer extends Thread {
 
@@ -29,18 +33,28 @@ public class SignalAwait {
 					}
 				}
 				System.out.println("took " + queue.remove());
+				empty.signal();
 				lock.unlock();
 			}
 		}
 	}
 
 	public class Producer extends Thread {
+		;
 		Random rand = new Random();
 
 		@Override
 		public void run() {
 			while (keealive) {
 				lock.lock();
+				while (queue.size() == CAP) {
+					try {
+						empty.await();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				queue.add(rand.nextInt());
 				full.signal();
 				lock.unlock();
